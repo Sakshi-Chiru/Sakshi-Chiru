@@ -40,7 +40,7 @@
             overflow: hidden;
         }
 
-        /* Top Left Home Button */
+        /* Top Left Home Button - Initially Hidden */
         .home-btn {
             position: fixed;
             top: 25px;
@@ -56,10 +56,15 @@
             z-index: 1001;
             box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
             transition: all 0.3s ease;
-            display: flex;
+            display: none; /* HIDDEN UNTIL LOGIN */
             align-items: center;
             justify-content: center;
             text-decoration: none;
+        }
+        
+        .home-btn.visible {
+            display: flex;
+            animation: popIn 0.5s ease-out;
         }
 
         .home-btn:hover {
@@ -88,15 +93,70 @@
             animation: floatSlow 6s ease-in-out infinite;
         }
 
+        /* Login Page */
+        #loginPage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #FFE5EC 0%, #FFC0E0 50%, #FFE5EC 100%);
+            padding: 20px;
+        }
+        
+        .login-input {
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 2px solid var(--pink-accent);
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.5rem;
+            text-align: center;
+            width: 200px;
+            outline: none;
+            color: var(--text-primary);
+            margin-bottom: 25px;
+            transition: all 0.3s;
+            letter-spacing: 5px;
+        }
+        
+        .login-input:focus {
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+            width: 220px;
+        }
+        
+        .error-shake {
+            animation: shake 0.5s;
+            border-color: red !important;
+            color: red;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+        }
+
         /* Question Page */
         #questionPage {
             position: relative;
             width: 100%;
             min-height: 100vh;
-            display: flex;
+            display: none; /* HIDDEN UNTIL LOGIN */
             justify-content: center;
             align-items: center;
             padding: 20px;
+        }
+        
+        #questionPage.active {
+            display: flex;
+            animation: fadeIn 1s ease-out;
         }
 
         .glass-container {
@@ -194,6 +254,19 @@
             position: relative;
             z-index: 2;
         }
+        
+        /* Used for Login button too */
+        .login-btn {
+            background: linear-gradient(135deg, #FF1493, #FF69B4);
+            color: white;
+            transform: scale(1);
+            opacity: 1;
+        }
+        .login-btn:hover {
+            background: linear-gradient(135deg, #FF69B4, #FF1493);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
 
         .yes-btn.show {
             animation: popIn 0.5s ease-out forwards;
@@ -231,10 +304,6 @@
         button:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .yes-btn:hover {
-            background: linear-gradient(135deg, #FF69B4, #FF1493);
         }
         
         .no-btn:hover {
@@ -352,7 +421,7 @@
         .gallery-item img {
             width: 100%;
             height: 250px;
-            object-fit: contain;
+            object-fit: cover;
             border-radius: 15px;
             margin-bottom: 15px;
         }
@@ -618,6 +687,18 @@
     <div class="heart-bg" style="top: 50%; left: 5%; animation-delay: 4s;">💓</div>
     <div class="heart-bg" style="top: 60%; right: 8%; animation-delay: 5s;">💞</div>
 
+    <div id="loginPage">
+        <div class="glass-container">
+            <h1 style="font-size: 2.5rem; margin-bottom: 30px;">Enter Secret Code 🔒</h1>
+            <input type="password" id="loginInput" class="login-input" placeholder="0000" maxlength="4">
+            <br>
+            <button class="login-btn" id="loginBtn">Unlock ❤️</button>
+            <p id="loginError" style="color: #d32f2f; margin-top: 15px; font-weight: bold; opacity: 0; transition: opacity 0.3s;">
+                Wrong Code! Try again.
+            </p>
+        </div>
+    </div>
+
     <div id="questionPage">
         <div class="glass-container">
             <img src="" alt="Love GIF" class="side-gif gif-left" id="leftGif">
@@ -670,8 +751,8 @@
         // Configuration - CUSTOMIZED FOR YOUR FOLDER STRUCTURE
         const CONFIG = {
             // GIFs - Fixed with direct media links
-            leftGif: 'images/gif1.gif',
-            rightGif: 'images/gif2.gif',
+            leftGif: 'https://media.tenor.com/nfkOecjN04EAAAAi/bubu-dudu.gif',
+            rightGif: 'https://media.tenor.com/fA2c5g9iZ6QAAAAi/bubu-dudu-love.gif',
             
             // Music - Assumes you have a 'music' folder
             sadMusicPath: 'music/sad-song.mp3',
@@ -728,6 +809,12 @@
         const homeBtn = document.getElementById('homeBtn');
         const leftGif = document.getElementById('leftGif');
         const rightGif = document.getElementById('rightGif');
+        
+        // Login Elements
+        const loginPage = document.getElementById('loginPage');
+        const loginInput = document.getElementById('loginInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginError = document.getElementById('loginError');
 
         let noClickCount = 0;
         let currentMusic = null; // Track which music is currently playing
@@ -740,8 +827,34 @@
         // Set initial volume to 20%
         sadMusic.volume = 0.2;
         romanticMusic.volume = 0.2;
+
+        // --- LOGIN LOGIC ---
+        function checkLogin() {
+            const code = loginInput.value;
+            if (code === "0102") {
+                // Success!
+                loginPage.style.opacity = '0';
+                setTimeout(() => {
+                    loginPage.style.display = 'none';
+                    questionPage.classList.add('active');
+                    // Show home button only after login
+                    homeBtn.classList.add('visible');
+                }, 500);
+            } else {
+                // Fail
+                loginInput.classList.add('error-shake');
+                loginError.style.opacity = '1';
+                setTimeout(() => {
+                    loginInput.classList.remove('error-shake');
+                }, 500);
+            }
+        }
+
+        loginBtn.addEventListener('click', checkLogin);
+        loginInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkLogin();
+        });
         
-        // No button click handler
         // No button click handler
         noBtn.addEventListener('click', () => {
             if (noClickCount === 0) {
@@ -766,7 +879,7 @@
                 // Make No button bounce immediately
                 noBtn.classList.add('bounce');
                 
-                // --- CHANGED: DELAY YES BUTTON BY 5 SECONDS ---
+                // Show Yes button after 5 second delay
                 setTimeout(() => {
                     yesBtn.classList.add('show');
                 }, 5000); // 5000ms = 5 seconds
