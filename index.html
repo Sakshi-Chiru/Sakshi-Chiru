@@ -59,7 +59,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            text-decoration: none; /* In case we use 'a' tag later */
+            text-decoration: none;
         }
 
         .home-btn:hover {
@@ -209,16 +209,15 @@
             background: linear-gradient(135deg, #6C757D, #495057);
             color: white;
             position: relative;
-            z-index: 1;
-            transition: all 0.3s ease;
+            z-index: 9999; /* High z-index to stay above everything when moving */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             border: 3px solid rgba(255, 255, 255, 0.5);
         }
         
+        /* Class applied when it starts running */
         .no-btn.moving {
             position: fixed;
-            transition: all 0.2s ease-out;
-            max-width: calc(100vw - 60px);
-            max-height: calc(100vh - 60px);
+            transition: top 0.2s ease-out, left 0.2s ease-out;
         }
 
         .no-btn.bounce {
@@ -779,9 +778,15 @@
                 // First time hovering after click - convert to fixed position
                 if (!noBtn.classList.contains('moving')) {
                     const rect = noBtn.getBoundingClientRect();
+                    
+                    // IMPORTANT: Move button to body to ensure it uses viewport coordinates correctly
+                    // This prevents it from getting stuck in the glass container
+                    document.body.appendChild(noBtn);
+                    
                     noBtn.classList.add('moving');
                     noBtn.style.left = rect.left + 'px';
                     noBtn.style.top = rect.top + 'px';
+                    
                     document.body.classList.add('no-scroll');
                 }
                 
@@ -797,8 +802,8 @@
             const buttonWidth = noBtn.offsetWidth;
             const buttonHeight = noBtn.offsetHeight;
             
-            // Calculate safe boundaries with generous padding
-            const padding = 30;
+            // Calculate safe boundaries with extra padding to ensure it stays well within screen
+            const padding = 40;
             const minX = padding;
             const minY = padding;
             const maxX = viewportWidth - buttonWidth - padding;
@@ -808,13 +813,21 @@
             let randomX = minX + Math.random() * (maxX - minX);
             let randomY = minY + Math.random() * (maxY - minY);
             
-            // Clamp values to ensure they're within bounds
+            // Clamp values to ensure they're strictly within bounds
+            // This guarantees the button never overflows
             randomX = Math.max(minX, Math.min(randomX, maxX));
             randomY = Math.max(minY, Math.min(randomY, maxY));
             
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
         }
+        
+        // Add listener for window resize to ensure button stays in bounds if screen changes
+        window.addEventListener('resize', () => {
+            if (noBtn.classList.contains('moving')) {
+                moveNoButton();
+            }
+        });
         
         // Also move on touch devices
         noBtn.addEventListener('touchstart', (e) => {
@@ -823,6 +836,8 @@
                 
                 if (!noBtn.classList.contains('moving')) {
                     const rect = noBtn.getBoundingClientRect();
+                    document.body.appendChild(noBtn); // Move to body
+                    
                     noBtn.classList.add('moving');
                     noBtn.style.left = rect.left + 'px';
                     noBtn.style.top = rect.top + 'px';
@@ -875,26 +890,23 @@
             galleryPage.classList.add('active');
         });
 
-        // --- NEW HOME BUTTON LOGIC ---
+        // --- HOME BUTTON LOGIC ---
         homeBtn.addEventListener('click', () => {
             // 1. Hide Question Page / Show Gallery
             questionPage.style.display = 'none';
             galleryPage.classList.add('active');
 
-            // 2. Hide the Yes/No buttons so they don't interfere if user goes back via browser (unlikely but safe)
-            // or just to clean up the state
+            // 2. Hide the Yes/No buttons so they don't interfere
             yesBtn.style.display = 'none';
             noBtn.style.display = 'none';
             nextBtn.classList.remove('hidden');
 
             // 3. Handle Music (Switch to Romantic)
-            // If sad music is playing, pause it
             if (!sadMusic.paused) {
                 sadMusic.pause();
                 sadMusic.currentTime = 0;
             }
 
-            // Play romantic music if it's not already playing
             if (romanticMusic.paused) {
                 romanticMusic.play()
                     .then(() => {
@@ -903,10 +915,9 @@
                         pauseBtn.textContent = '⏸️';
                         pauseBtn.classList.remove('disabled');
                     })
-                    .catch(e => console.log('Auto-play prevented (user interaction needed first)'));
+                    .catch(e => console.log('Auto-play prevented'));
             }
             
-            // Optional: Trigger confetti
             createConfetti();
         });
 
