@@ -30,13 +30,12 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center; /* This centers the Question page, but we will change this via JS for the Gallery */
+            align-items: center;
             overflow-x: hidden;
             position: relative;
             padding-bottom: 5vh;
         }
         
-        /* This class locks scrolling when the No button is running away */
         body.no-scroll {
             overflow: hidden !important;
         }
@@ -418,12 +417,73 @@
             box-shadow: 0 12px 40px rgba(255, 105, 180, 0.4);
         }
 
-        .gallery-item img {
+        /* --- CAROUSEL STYLES --- */
+        .carousel-container {
+            position: relative;
             width: 100%;
             height: 250px;
-            object-fit: contain;
+            overflow: hidden;
             border-radius: 15px;
             margin-bottom: 15px;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s ease-in-out;
+            height: 100%;
+            width: 100%;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.6);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--pink-dark);
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            opacity: 0; /* Hidden by default */
+        }
+
+        /* Show buttons on hover */
+        .gallery-item:hover .carousel-btn {
+            opacity: 1;
+        }
+
+        .carousel-btn:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .prev-btn { left: 10px; }
+        .next-btn { right: 10px; }
+
+        /* Hide buttons if there is only 1 image */
+        .carousel-container.single-slide .carousel-btn {
+            display: none !important;
         }
 
         .gallery-item h3 {
@@ -502,6 +562,12 @@
                 font-size: 1.2rem;
                 top: 15px;
                 left: 15px;
+            }
+            
+            /* Always show carousel buttons on mobile */
+            .carousel-btn {
+                opacity: 1;
+                background: rgba(255, 255, 255, 0.4);
             }
         }
 
@@ -748,7 +814,7 @@
     </div>
 
     <script>
-        // Configuration - CUSTOMIZED FOR YOUR FOLDER STRUCTURE
+        // Configuration - CUSTOMIZED FOR CAROUSEL SUPPORT
         const CONFIG = {
             // GIFs - Fixed with direct media links
             leftGif: 'images/gif1.gif',
@@ -758,35 +824,37 @@
             sadMusicPath: 'music/sad-song.mp3',
             romanticMusicPath: 'music/romantic-song.mp3',
             
-            // Gallery images - Assumes you have an 'images' folder
+            // Gallery images - UPDATED TO SUPPORT ARRAYS (CAROUSEL)
+            // Use 'images' array instead of single 'src'
+            // Convention: memory1 -> memory11.jpg, memory12.jpg, etc.
             galleryImages: [
                 {
-                    src: 'images/memory1.jpg',
+                    images: ['images/memory11.jpg', 'images/memory12.jpg'], 
                     title: 'Our First Date',
                     text: 'The day everything changed and my heart knew you were the one. Every moment with you feels like magic.'
                 },
                 {
-                    src: 'images/memory2.jpg',
+                    images: ['images/memory21.jpg'], 
                     title: 'Adventure Together',
                     text: 'Exploring the world with you by my side. Every journey is better when we\'re together.'
                 },
                 {
-                    src: 'images/memory3.jpg',
+                    images: ['images/memory31.jpg', 'images/memory32.jpg', 'images/memory33.jpg'],
                     title: 'Cozy Moments',
                     text: 'Those quiet evenings where just being together is enough. Your presence is my favorite comfort.'
                 },
                 {
-                    src: 'images/memory4.jpg',
+                    images: ['images/memory41.jpg'],
                     title: 'Celebrations',
                     text: 'Every milestone with you is worth celebrating. You make the ordinary extraordinary.'
                 },
                 {
-                    src: 'images/memory5.jpg',
+                    images: ['images/memory51.jpg', 'images/memory52.jpg'],
                     title: 'Late Night Talks',
                     text: 'Those conversations that last until sunrise. I could listen to you forever.'
                 },
                 {
-                    src: 'images/memory6.jpg',
+                    images: ['images/memory61.jpg'],
                     title: 'Forever & Always',
                     text: 'This is just the beginning of our beautiful story together. I love you more each day. 💕'
                 }
@@ -1068,7 +1136,7 @@
             }
         }
 
-        // Initialize gallery images from config
+        // Initialize gallery images from config with CAROUSEL LOGIC
         window.addEventListener('DOMContentLoaded', () => {
             const galleryGrid = document.querySelector('.gallery-grid');
             galleryGrid.innerHTML = ''; // Clear dummy content
@@ -1078,18 +1146,63 @@
                 galleryItem.className = 'gallery-item';
                 galleryItem.style.animationDelay = `${(index + 1) * 0.1}s`;
                 
+                // Build images HTML
+                let imagesHtml = '';
+                if (item.images && item.images.length > 0) {
+                    item.images.forEach(imgSrc => {
+                        imagesHtml += `<div class="carousel-slide"><img src="${imgSrc}" alt="${item.title}"></div>`;
+                    });
+                } else if (item.src) {
+                    // Fallback for old format if user forgets
+                    imagesHtml = `<div class="carousel-slide"><img src="${item.src}" alt="${item.title}"></div>`;
+                }
+
+                // Check if single slide to hide buttons
+                const singleSlideClass = (item.images && item.images.length > 1) ? '' : 'single-slide';
+
                 galleryItem.innerHTML = `
-                    <img src="${item.src}" alt="${item.title}">
+                    <div class="carousel-container ${singleSlideClass}" id="carousel-${index}">
+                        <div class="carousel-track" id="track-${index}">
+                            ${imagesHtml}
+                        </div>
+                        <button class="carousel-btn prev-btn" onclick="moveCarousel(${index}, -1)">❮</button>
+                        <button class="carousel-btn next-btn" onclick="moveCarousel(${index}, 1)">❯</button>
+                    </div>
                     <h3>${item.title}</h3>
                     <p>${item.text}</p>
                 `;
                 
                 galleryGrid.appendChild(galleryItem);
+                
+                // Initialize slide index for this carousel
+                slideIndices[index] = 0;
             });
             
             // Initialize volume slider background
             volumeSlider.style.background = 'linear-gradient(to right, #FF69B4 0%, #FF69B4 20%, #DDD 20%, #DDD 100%)';
         });
+
+        // --- CAROUSEL LOGIC ---
+        const slideIndices = {}; // Store current slide index for each carousel
+
+        function moveCarousel(carouselId, direction) {
+            const track = document.getElementById(`track-${carouselId}`);
+            const slides = track.children;
+            const totalSlides = slides.length;
+            
+            // Update index
+            let newIndex = slideIndices[carouselId] + direction;
+            
+            // Loop around
+            if (newIndex < 0) newIndex = totalSlides - 1;
+            if (newIndex >= totalSlides) newIndex = 0;
+            
+            slideIndices[carouselId] = newIndex;
+            
+            // Move track
+            const slideWidth = 100; // 100%
+            track.style.transform = `translateX(-${newIndex * slideWidth}%)`;
+        }
         
         // Pause/Play button functionality
         pauseBtn.addEventListener('click', () => {
