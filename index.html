@@ -40,6 +40,34 @@
             overflow: hidden;
         }
 
+        /* Top Left Home Button */
+        .home-btn {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            width: 50px;
+            height: 50px;
+            background: var(--pink-accent);
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none; /* In case we use 'a' tag later */
+        }
+
+        .home-btn:hover {
+            transform: scale(1.1) rotate(-10deg);
+            background: var(--pink-dark);
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.6);
+        }
+
         /* Floating hearts animation */
         @keyframes float {
             0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
@@ -400,6 +428,14 @@
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
+            
+            .home-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+                top: 15px;
+                left: 15px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -573,7 +609,10 @@
     </style>
 </head>
 <body>
-    <!-- Floating hearts background -->
+    <button class="home-btn" id="homeBtn" title="Go to Memories">
+        🏠
+    </button>
+
     <div class="heart-bg" style="top: 10%; left: 10%;">💖</div>
     <div class="heart-bg" style="top: 20%; right: 15%; animation-delay: 1s;">💕</div>
     <div class="heart-bg" style="bottom: 15%; left: 20%; animation-delay: 2s;">💝</div>
@@ -581,10 +620,8 @@
     <div class="heart-bg" style="top: 50%; left: 5%; animation-delay: 4s;">💓</div>
     <div class="heart-bg" style="top: 60%; right: 8%; animation-delay: 5s;">💞</div>
 
-    <!-- Question Page -->
     <div id="questionPage">
         <div class="glass-container">
-            <!-- Side GIFs - Replace src with your GIF URLs -->
             <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDV5bGR5Ym5qZGxvNzBxbnJvZ2N3dDR3bnZoeGNxdGNnZGl3ZHNmZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oEjI4sFlp73fvEYgw/giphy.gif" alt="Love GIF" class="side-gif gif-left">
             <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHBvdWxjYWR5ZnZqYnB3Nmx5ZWx5eGxhcDlpcWx6Z3FqYzdxMjRtaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HlSLn3E2e1PKQSO/giphy.gif" alt="Love GIF" class="side-gif gif-right">
             
@@ -600,7 +637,6 @@
         </div>
     </div>
 
-    <!-- Gallery Page -->
     <div id="galleryPage">
         <div class="gallery-container">
             <div class="celebration-message">
@@ -609,58 +645,18 @@
             </div>
 
             <div class="gallery-grid">
-                <!-- Gallery items - Replace images and text with your own -->
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400&h=300&fit=crop" alt="Memory 1">
-                    <h3>Our First Date</h3>
-                    <p>The day everything changed and my heart knew you were the one. Every moment with you feels like magic.</p>
                 </div>
-
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&h=300&fit=crop" alt="Memory 2">
-                    <h3>Adventure Together</h3>
-                    <p>Exploring the world with you by my side. Every journey is better when we're together.</p>
-                </div>
-
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=400&h=300&fit=crop" alt="Memory 3">
-                    <h3>Cozy Moments</h3>
-                    <p>Those quiet evenings where just being together is enough. Your presence is my favorite comfort.</p>
-                </div>
-
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&h=300&fit=crop" alt="Memory 4">
-                    <h3>Celebrations</h3>
-                    <p>Every milestone with you is worth celebrating. You make the ordinary extraordinary.</p>
-                </div>
-
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=400&h=300&fit=crop" alt="Memory 5">
-                    <h3>Late Night Talks</h3>
-                    <p>Those conversations that last until sunrise. I could listen to you forever.</p>
-                </div>
-
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=400&h=300&fit=crop" alt="Memory 6">
-                    <h3>Forever & Always</h3>
-                    <p>This is just the beginning of our beautiful story together. I love you more each day. 💕</p>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- Audio elements for background music -->
     <audio id="sadMusic" loop preload="auto">
-        <!-- Replace with your sad music file path -->
         <source src="music/sad-song.mp3" type="audio/mpeg">
     </audio>
     
     <audio id="romanticMusic" loop preload="auto">
-        <!-- Replace with your romantic music file path -->
         <source src="music/romantic-song.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Music Controls -->
     <div class="music-controls" id="musicControls">
         <button class="pause-btn disabled" id="pauseBtn" title="Pause/Play Music">
             ▶️
@@ -673,17 +669,17 @@
     </div>
 
     <script>
-        // Configuration - CUSTOMIZE THESE
+        // Configuration - CUSTOMIZED FOR YOUR FOLDER STRUCTURE
         const CONFIG = {
-            // Replace with your actual GIF URLs
+            // GIFs
             leftGif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDV5bGR5Ym5qZGxvNzBxbnJvZ2N3dDR3bnZoeGNxdGNnZGl3ZHNmZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oEjI4sFlp73fvEYgw/giphy.gif',
             rightGif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHBvdWxjYWR5ZnZqYnB3Nmx5ZWx5eGxhcDlpcWx6Z3FqYzdxMjRtaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HlSLn3E2e1PKQSO/giphy.gif',
             
-            // Replace with your music file paths
+            // Music - Assumes you have a 'music' folder
             sadMusicPath: 'music/sad-song.mp3',
             romanticMusicPath: 'music/romantic-song.mp3',
             
-            // Gallery images - Replace these with your actual image paths
+            // Gallery images - Assumes you have an 'images' folder
             galleryImages: [
                 {
                     src: 'images/memory1.jpg',
@@ -731,59 +727,32 @@
         const pauseBtn = document.getElementById('pauseBtn');
         const volumeSlider = document.getElementById('volumeSlider');
         const volumeValue = document.getElementById('volumeValue');
+        const homeBtn = document.getElementById('homeBtn');
 
         let noClickCount = 0;
         let currentMusic = null; // Track which music is currently playing
         let isPaused = false;
         
-        console.log('=== MUSIC CONTROLS INITIALIZATION ===');
-        console.log('Music controls element:', musicControls);
-        console.log('Pause button element:', pauseBtn);
-        console.log('Volume slider element:', volumeSlider);
-        
         // Set initial volume to 20%
         sadMusic.volume = 0.2;
         romanticMusic.volume = 0.2;
-        console.log('Initial volume set to 20% (0.2)');
-        console.log('Sad music volume:', sadMusic.volume);
-        console.log('Romantic music volume:', romanticMusic.volume);
         
-        // Check audio elements on load
-        window.addEventListener('DOMContentLoaded', () => {
-            console.log('=== PAGE LOADED ===');
-            console.log('Sad music element:', sadMusic);
-            console.log('Romantic music element:', romanticMusic);
-            console.log('Sad music src:', sadMusic.src);
-            console.log('Romantic music src:', romanticMusic.src);
-            console.log('Music controls visible:', window.getComputedStyle(musicControls).display !== 'none');
-        });
-
         // No button click handler
         noBtn.addEventListener('click', () => {
             if (noClickCount === 0) {
-                console.log('=== NO BUTTON CLICKED ===');
-                console.log('Attempting to play sad music...');
-                
                 // First click - play SAD music and show message
                 sadMusic.play()
                     .then(() => {
-                        console.log('✓ Sad music playing successfully');
-                        console.log('Current time:', sadMusic.currentTime);
-                        console.log('Duration:', sadMusic.duration);
                         currentMusic = sadMusic;
                         isPaused = false;
                         pauseBtn.textContent = '⏸️';
                         pauseBtn.classList.remove('disabled');
-                        console.log('Pause button enabled and set to pause icon');
                     })
                     .catch(e => {
-                        console.error('✗ Audio play prevented:', e);
-                        console.log('Attempting recovery: loading audio and retrying...');
-                        // Try to load the audio
+                        console.error('Audio play prevented:', e);
+                        // Try recovery
                         sadMusic.load();
-                        sadMusic.play()
-                            .then(() => console.log('✓ Second attempt successful'))
-                            .catch(err => console.error('✗ Second attempt failed:', err));
+                        sadMusic.play().catch(e => console.error('Recovery failed', e));
                     });
                 
                 message.textContent = 'Why didn\'t you report the bug, Itna easily no bol diya';
@@ -801,7 +770,6 @@
                 }, 2000);
                 
                 noClickCount++;
-                console.log('No click count:', noClickCount);
             }
         });
 
@@ -867,32 +835,21 @@
 
         // Yes button click handler
         yesBtn.addEventListener('click', () => {
-            console.log('=== YES BUTTON CLICKED ===');
-            console.log('Switching from sad music to romantic music...');
-            
             // Stop sad music and play romantic music
             sadMusic.pause();
             sadMusic.currentTime = 0;
-            console.log('✓ Sad music stopped and reset');
             
             romanticMusic.play()
                 .then(() => {
-                    console.log('✓ Romantic music playing successfully');
-                    console.log('Current time:', romanticMusic.currentTime);
-                    console.log('Duration:', romanticMusic.duration);
                     currentMusic = romanticMusic;
                     isPaused = false;
                     pauseBtn.textContent = '⏸️';
                     pauseBtn.classList.remove('disabled');
-                    console.log('Pause button enabled and set to pause icon');
                 })
                 .catch(e => {
-                    console.error('✗ Romantic music play prevented:', e);
-                    console.log('Attempting recovery: loading audio and retrying...');
+                    console.error('Romantic music play prevented:', e);
                     romanticMusic.load();
-                    romanticMusic.play()
-                        .then(() => console.log('✓ Second attempt successful'))
-                        .catch(err => console.error('✗ Second attempt failed:', err));
+                    romanticMusic.play().catch(e => console.error('Recovery failed', e));
                 });
             
             // Create confetti
@@ -916,6 +873,41 @@
         nextBtn.addEventListener('click', () => {
             questionPage.style.display = 'none';
             galleryPage.classList.add('active');
+        });
+
+        // --- NEW HOME BUTTON LOGIC ---
+        homeBtn.addEventListener('click', () => {
+            // 1. Hide Question Page / Show Gallery
+            questionPage.style.display = 'none';
+            galleryPage.classList.add('active');
+
+            // 2. Hide the Yes/No buttons so they don't interfere if user goes back via browser (unlikely but safe)
+            // or just to clean up the state
+            yesBtn.style.display = 'none';
+            noBtn.style.display = 'none';
+            nextBtn.classList.remove('hidden');
+
+            // 3. Handle Music (Switch to Romantic)
+            // If sad music is playing, pause it
+            if (!sadMusic.paused) {
+                sadMusic.pause();
+                sadMusic.currentTime = 0;
+            }
+
+            // Play romantic music if it's not already playing
+            if (romanticMusic.paused) {
+                romanticMusic.play()
+                    .then(() => {
+                        currentMusic = romanticMusic;
+                        isPaused = false;
+                        pauseBtn.textContent = '⏸️';
+                        pauseBtn.classList.remove('disabled');
+                    })
+                    .catch(e => console.log('Auto-play prevented (user interaction needed first)'));
+            }
+            
+            // Optional: Trigger confetti
+            createConfetti();
         });
 
         // Create confetti effect
@@ -956,38 +948,24 @@
                 
                 galleryGrid.appendChild(galleryItem);
             });
+            
+            // Initialize volume slider background
+            volumeSlider.style.background = 'linear-gradient(to right, #FF69B4 0%, #FF69B4 20%, #DDD 20%, #DDD 100%)';
         });
         
         // Pause/Play button functionality
         pauseBtn.addEventListener('click', () => {
-            console.log('=== PAUSE/PLAY BUTTON CLICKED ===');
-            
-            if (!currentMusic) {
-                console.log('✗ No music is currently playing');
-                return;
-            }
+            if (!currentMusic) return;
             
             if (isPaused) {
-                // Resume playing
-                console.log('Attempting to resume music...');
-                currentMusic.play()
-                    .then(() => {
-                        isPaused = false;
-                        pauseBtn.textContent = '⏸️';
-                        console.log('✓ Music resumed successfully');
-                        console.log('Current time:', currentMusic.currentTime);
-                    })
-                    .catch(e => {
-                        console.error('✗ Resume failed:', e);
-                    });
+                currentMusic.play().then(() => {
+                    isPaused = false;
+                    pauseBtn.textContent = '⏸️';
+                });
             } else {
-                // Pause
-                console.log('Pausing music...');
                 currentMusic.pause();
                 isPaused = true;
                 pauseBtn.textContent = '▶️';
-                console.log('✓ Music paused successfully');
-                console.log('Current time:', currentMusic.currentTime);
             }
         });
         
@@ -1002,14 +980,7 @@
             
             // Update slider background gradient
             e.target.style.background = `linear-gradient(to right, #FF69B4 0%, #FF69B4 ${percentage}%, #DDD ${percentage}%, #DDD 100%)`;
-            
-            console.log(`Volume adjusted to ${percentage}% (${volume.toFixed(2)})`);
         });
-        
-        // Initialize slider background and volume display
-        console.log('=== INITIALIZING VOLUME SLIDER ===');
-        volumeSlider.style.background = 'linear-gradient(to right, #FF69B4 0%, #FF69B4 20%, #DDD 20%, #DDD 100%)';
-        console.log('Volume slider initialized with 20% background');
     </script>
 </body>
 </html>
