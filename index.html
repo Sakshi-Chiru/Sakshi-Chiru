@@ -415,6 +415,132 @@
         .hidden {
             display: none !important;
         }
+        
+        /* Music Controls */
+        .music-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(255, 105, 180, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .music-controls.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .pause-btn {
+            background: linear-gradient(135deg, #FF1493, #FF69B4);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .pause-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 20, 147, 0.6);
+        }
+        
+        .pause-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .volume-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .volume-label {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100px;
+            height: 6px;
+            border-radius: 5px;
+            background: linear-gradient(to right, #FF69B4 0%, #FF69B4 20%, #DDD 20%, #DDD 100%);
+            outline: none;
+            transition: background 0.3s ease;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF1493, #FF69B4);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.4);
+            transition: all 0.2s ease;
+        }
+        
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 3px 12px rgba(255, 20, 147, 0.6);
+        }
+        
+        .volume-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF1493, #FF69B4);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.4);
+            transition: all 0.2s ease;
+        }
+        
+        .volume-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 3px 12px rgba(255, 20, 147, 0.6);
+        }
+        
+        @media (max-width: 768px) {
+            .music-controls {
+                bottom: 20px;
+                right: 20px;
+                padding: 15px;
+            }
+            
+            .pause-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1rem;
+            }
+            
+            .volume-slider {
+                width: 80px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -504,6 +630,17 @@
         <!-- Replace with your romantic music file path -->
         <source src="music/romantic-song.mp3" type="audio/mpeg">
     </audio>
+
+    <!-- Music Controls -->
+    <div class="music-controls" id="musicControls">
+        <button class="pause-btn" id="pauseBtn" title="Pause/Play Music">
+            ⏸️
+        </button>
+        <div class="volume-control">
+            <span class="volume-label">🔊</span>
+            <input type="range" min="0" max="100" value="20" class="volume-slider" id="volumeSlider">
+        </div>
+    </div>
 
     <script>
         // Configuration - CUSTOMIZE THESE
