@@ -425,57 +425,67 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            background: var(--glass-bg);
+            background: rgba(255, 240, 245, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 20px;
             border-radius: 20px;
-            border: 2px solid var(--glass-border);
-            box-shadow: 0 8px 32px rgba(255, 105, 180, 0.3);
-            opacity: 0;
-            transform: translateY(20px);
+            border: 3px solid rgba(255, 105, 180, 0.6);
+            box-shadow: 0 8px 32px rgba(255, 105, 180, 0.4);
+            opacity: 1;
+            transform: translateY(0);
             transition: all 0.3s ease;
         }
         
-        .music-controls.show {
-            opacity: 1;
-            transform: translateY(0);
+        .music-controls.hidden {
+            display: none;
         }
         
         .pause-btn {
             background: linear-gradient(135deg, #FF1493, #FF69B4);
             color: white;
             border: none;
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.5);
             transition: all 0.3s ease;
+            align-self: center;
         }
         
         .pause-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(255, 20, 147, 0.6);
+            box-shadow: 0 6px 20px rgba(255, 20, 147, 0.7);
         }
         
         .pause-btn:active {
             transform: scale(0.95);
         }
         
+        .pause-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         .volume-control {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .volume-label {
-            font-size: 0.85rem;
+            font-size: 1.5rem;
+            color: var(--pink-dark);
+        }
+        
+        .volume-value {
+            font-size: 0.9rem;
             color: var(--text-primary);
             font-weight: 600;
         }
@@ -483,8 +493,8 @@
         .volume-slider {
             -webkit-appearance: none;
             appearance: none;
-            width: 100px;
-            height: 6px;
+            width: 120px;
+            height: 8px;
             border-radius: 5px;
             background: linear-gradient(to right, #FF69B4 0%, #FF69B4 20%, #DDD 20%, #DDD 100%);
             outline: none;
@@ -494,34 +504,34 @@
         .volume-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: linear-gradient(135deg, #FF1493, #FF69B4);
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.4);
+            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.5);
             transition: all 0.2s ease;
         }
         
         .volume-slider::-webkit-slider-thumb:hover {
             transform: scale(1.2);
-            box-shadow: 0 3px 12px rgba(255, 20, 147, 0.6);
+            box-shadow: 0 3px 12px rgba(255, 20, 147, 0.7);
         }
         
         .volume-slider::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: linear-gradient(135deg, #FF1493, #FF69B4);
             cursor: pointer;
             border: none;
-            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.4);
+            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.5);
             transition: all 0.2s ease;
         }
         
         .volume-slider::-moz-range-thumb:hover {
             transform: scale(1.2);
-            box-shadow: 0 3px 12px rgba(255, 20, 147, 0.6);
+            box-shadow: 0 3px 12px rgba(255, 20, 147, 0.7);
         }
         
         @media (max-width: 768px) {
@@ -532,13 +542,13 @@
             }
             
             .pause-btn {
-                width: 45px;
-                height: 45px;
-                font-size: 1rem;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
             }
             
             .volume-slider {
-                width: 80px;
+                width: 100px;
             }
         }
     </style>
@@ -633,12 +643,13 @@
 
     <!-- Music Controls -->
     <div class="music-controls" id="musicControls">
-        <button class="pause-btn" id="pauseBtn" title="Pause/Play Music">
-            ⏸️
+        <button class="pause-btn disabled" id="pauseBtn" title="Pause/Play Music">
+            ▶️
         </button>
         <div class="volume-control">
             <span class="volume-label">🔊</span>
             <input type="range" min="0" max="100" value="20" class="volume-slider" id="volumeSlider">
+            <span class="volume-value" id="volumeValue">20%</span>
         </div>
     </div>
 
@@ -697,34 +708,63 @@
         const galleryPage = document.getElementById('galleryPage');
         const sadMusic = document.getElementById('sadMusic');
         const romanticMusic = document.getElementById('romanticMusic');
+        const musicControls = document.getElementById('musicControls');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeValue = document.getElementById('volumeValue');
 
         let noClickCount = 0;
+        let currentMusic = null; // Track which music is currently playing
+        let isPaused = false;
+        
+        console.log('=== MUSIC CONTROLS INITIALIZATION ===');
+        console.log('Music controls element:', musicControls);
+        console.log('Pause button element:', pauseBtn);
+        console.log('Volume slider element:', volumeSlider);
+        
+        // Set initial volume to 20%
+        sadMusic.volume = 0.2;
+        romanticMusic.volume = 0.2;
+        console.log('Initial volume set to 20% (0.2)');
+        console.log('Sad music volume:', sadMusic.volume);
+        console.log('Romantic music volume:', romanticMusic.volume);
         
         // Check audio elements on load
         window.addEventListener('DOMContentLoaded', () => {
-            console.log('Page loaded - checking audio elements');
+            console.log('=== PAGE LOADED ===');
             console.log('Sad music element:', sadMusic);
             console.log('Romantic music element:', romanticMusic);
             console.log('Sad music src:', sadMusic.src);
             console.log('Romantic music src:', romanticMusic.src);
+            console.log('Music controls visible:', window.getComputedStyle(musicControls).display !== 'none');
         });
 
         // No button click handler
         noBtn.addEventListener('click', () => {
             if (noClickCount === 0) {
-                console.log('No button clicked - attempting to play sad music');
+                console.log('=== NO BUTTON CLICKED ===');
+                console.log('Attempting to play sad music...');
                 
                 // First click - play SAD music and show message
                 sadMusic.play()
                     .then(() => {
-                        console.log('Sad music playing successfully');
+                        console.log('✓ Sad music playing successfully');
+                        console.log('Current time:', sadMusic.currentTime);
+                        console.log('Duration:', sadMusic.duration);
+                        currentMusic = sadMusic;
+                        isPaused = false;
+                        pauseBtn.textContent = '⏸️';
+                        pauseBtn.classList.remove('disabled');
+                        console.log('Pause button enabled and set to pause icon');
                     })
                     .catch(e => {
-                        console.error('Audio play prevented:', e);
-                        console.log('Trying to enable audio after user interaction...');
+                        console.error('✗ Audio play prevented:', e);
+                        console.log('Attempting recovery: loading audio and retrying...');
                         // Try to load the audio
                         sadMusic.load();
-                        sadMusic.play().catch(err => console.error('Second attempt failed:', err));
+                        sadMusic.play()
+                            .then(() => console.log('✓ Second attempt successful'))
+                            .catch(err => console.error('✗ Second attempt failed:', err));
                     });
                 
                 message.textContent = 'Why didn\'t you report the bug, Itna easily no bol diya';
@@ -742,6 +782,7 @@
                 }, 2000);
                 
                 noClickCount++;
+                console.log('No click count:', noClickCount);
             }
         });
 
@@ -807,21 +848,32 @@
 
         // Yes button click handler
         yesBtn.addEventListener('click', () => {
-            console.log('Yes button clicked - switching to romantic music');
+            console.log('=== YES BUTTON CLICKED ===');
+            console.log('Switching from sad music to romantic music...');
             
             // Stop sad music and play romantic music
             sadMusic.pause();
             sadMusic.currentTime = 0;
-            console.log('Sad music stopped');
+            console.log('✓ Sad music stopped and reset');
             
             romanticMusic.play()
                 .then(() => {
-                    console.log('Romantic music playing successfully');
+                    console.log('✓ Romantic music playing successfully');
+                    console.log('Current time:', romanticMusic.currentTime);
+                    console.log('Duration:', romanticMusic.duration);
+                    currentMusic = romanticMusic;
+                    isPaused = false;
+                    pauseBtn.textContent = '⏸️';
+                    pauseBtn.classList.remove('disabled');
+                    console.log('Pause button enabled and set to pause icon');
                 })
                 .catch(e => {
-                    console.error('Romantic music play prevented:', e);
+                    console.error('✗ Romantic music play prevented:', e);
+                    console.log('Attempting recovery: loading audio and retrying...');
                     romanticMusic.load();
-                    romanticMusic.play().catch(err => console.error('Second attempt failed:', err));
+                    romanticMusic.play()
+                        .then(() => console.log('✓ Second attempt successful'))
+                        .catch(err => console.error('✗ Second attempt failed:', err));
                 });
             
             // Create confetti
@@ -884,6 +936,59 @@
                 galleryGrid.appendChild(galleryItem);
             });
         });
+        
+        // Pause/Play button functionality
+        pauseBtn.addEventListener('click', () => {
+            console.log('=== PAUSE/PLAY BUTTON CLICKED ===');
+            
+            if (!currentMusic) {
+                console.log('✗ No music is currently playing');
+                return;
+            }
+            
+            if (isPaused) {
+                // Resume playing
+                console.log('Attempting to resume music...');
+                currentMusic.play()
+                    .then(() => {
+                        isPaused = false;
+                        pauseBtn.textContent = '⏸️';
+                        console.log('✓ Music resumed successfully');
+                        console.log('Current time:', currentMusic.currentTime);
+                    })
+                    .catch(e => {
+                        console.error('✗ Resume failed:', e);
+                    });
+            } else {
+                // Pause
+                console.log('Pausing music...');
+                currentMusic.pause();
+                isPaused = true;
+                pauseBtn.textContent = '▶️';
+                console.log('✓ Music paused successfully');
+                console.log('Current time:', currentMusic.currentTime);
+            }
+        });
+        
+        // Volume slider functionality
+        volumeSlider.addEventListener('input', (e) => {
+            const percentage = e.target.value;
+            const volume = percentage / 100;
+            
+            sadMusic.volume = volume;
+            romanticMusic.volume = volume;
+            volumeValue.textContent = percentage + '%';
+            
+            // Update slider background gradient
+            e.target.style.background = `linear-gradient(to right, #FF69B4 0%, #FF69B4 ${percentage}%, #DDD ${percentage}%, #DDD 100%)`;
+            
+            console.log(`Volume adjusted to ${percentage}% (${volume.toFixed(2)})`);
+        });
+        
+        // Initialize slider background and volume display
+        console.log('=== INITIALIZING VOLUME SLIDER ===');
+        volumeSlider.style.background = 'linear-gradient(to right, #FF69B4 0%, #FF69B4 20%, #DDD 20%, #DDD 100%)';
+        console.log('Volume slider initialized with 20% background');
     </script>
 </body>
 </html>
