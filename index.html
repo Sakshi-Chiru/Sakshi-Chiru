@@ -30,14 +30,15 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: center; /* This centers the Question page, but we will change this via JS for the Gallery */
             overflow-x: hidden;
             position: relative;
             padding-bottom: 5vh;
         }
         
+        /* This class locks scrolling when the No button is running away */
         body.no-scroll {
-            overflow: hidden;
+            overflow: hidden !important;
         }
 
         /* Top Left Home Button - Initially Hidden */
@@ -191,7 +192,7 @@
             width: 120px;
             height: 120px;
             border-radius: 20px;
-            object-fit: cover;
+            object-fit: contain;
             box-shadow: 0 4px 20px rgba(255, 105, 180, 0.4);
             animation: float 3s ease-in-out infinite;
         }
@@ -255,7 +256,6 @@
             z-index: 2;
         }
         
-        /* Used for Login button too */
         .login-btn {
             background: linear-gradient(135deg, #FF1493, #FF69B4);
             color: white;
@@ -1007,6 +1007,10 @@
         nextBtn.addEventListener('click', () => {
             questionPage.style.display = 'none';
             galleryPage.classList.add('active');
+            
+            // FIX: Allow scrolling again and fix alignment for long content
+            document.body.classList.remove('no-scroll');
+            document.body.style.alignItems = 'flex-start'; 
         });
 
         // --- HOME BUTTON LOGIC ---
@@ -1014,6 +1018,10 @@
             // 1. Hide Question Page / Show Gallery
             questionPage.style.display = 'none';
             galleryPage.classList.add('active');
+            
+            // FIX: Allow scrolling again and fix alignment for long content
+            document.body.classList.remove('no-scroll');
+            document.body.style.alignItems = 'flex-start';
 
             // 2. Hide the Yes/No buttons so they don't interfere
             yesBtn.style.display = 'none';
