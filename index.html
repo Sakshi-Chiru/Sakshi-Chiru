@@ -495,12 +495,12 @@
     </div>
 
     <!-- Audio elements for background music -->
-    <audio id="sadMusic" loop>
+    <audio id="sadMusic" loop preload="auto">
         <!-- Replace with your sad music file path -->
         <source src="music/sad-song.mp3" type="audio/mpeg">
     </audio>
     
-    <audio id="romanticMusic" loop>
+    <audio id="romanticMusic" loop preload="auto">
         <!-- Replace with your romantic music file path -->
         <source src="music/romantic-song.mp3" type="audio/mpeg">
     </audio>
@@ -509,7 +509,7 @@
         // Configuration - CUSTOMIZE THESE
         const CONFIG = {
             // Replace with your actual GIF URLs
-            leftGif: 'https://tenor.com/lHzbGsbvSu4.gif',
+            leftGif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDV5bGR5Ym5qZGxvNzBxbnJvZ2N3dDR3bnZoeGNxdGNnZGl3ZHNmZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oEjI4sFlp73fvEYgw/giphy.gif',
             rightGif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHBvdWxjYWR5ZnZqYnB3Nmx5ZWx5eGxhcDlpcWx6Z3FqYzdxMjRtaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HlSLn3E2e1PKQSO/giphy.gif',
             
             // Replace with your music file paths
@@ -562,12 +562,33 @@
         const romanticMusic = document.getElementById('romanticMusic');
 
         let noClickCount = 0;
+        
+        // Check audio elements on load
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('Page loaded - checking audio elements');
+            console.log('Sad music element:', sadMusic);
+            console.log('Romantic music element:', romanticMusic);
+            console.log('Sad music src:', sadMusic.src);
+            console.log('Romantic music src:', romanticMusic.src);
+        });
 
         // No button click handler
         noBtn.addEventListener('click', () => {
             if (noClickCount === 0) {
+                console.log('No button clicked - attempting to play sad music');
+                
                 // First click - play SAD music and show message
-                sadMusic.play().catch(e => console.log('Audio play prevented:', e));
+                sadMusic.play()
+                    .then(() => {
+                        console.log('Sad music playing successfully');
+                    })
+                    .catch(e => {
+                        console.error('Audio play prevented:', e);
+                        console.log('Trying to enable audio after user interaction...');
+                        // Try to load the audio
+                        sadMusic.load();
+                        sadMusic.play().catch(err => console.error('Second attempt failed:', err));
+                    });
                 
                 message.textContent = 'Why didn\'t you report the bug, Itna easily no bol diya';
                 message.classList.add('show');
@@ -649,10 +670,22 @@
 
         // Yes button click handler
         yesBtn.addEventListener('click', () => {
+            console.log('Yes button clicked - switching to romantic music');
+            
             // Stop sad music and play romantic music
             sadMusic.pause();
             sadMusic.currentTime = 0;
-            romanticMusic.play().catch(e => console.log('Audio play prevented:', e));
+            console.log('Sad music stopped');
+            
+            romanticMusic.play()
+                .then(() => {
+                    console.log('Romantic music playing successfully');
+                })
+                .catch(e => {
+                    console.error('Romantic music play prevented:', e);
+                    romanticMusic.load();
+                    romanticMusic.play().catch(err => console.error('Second attempt failed:', err));
+                });
             
             // Create confetti
             createConfetti();
